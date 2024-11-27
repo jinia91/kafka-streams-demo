@@ -29,4 +29,13 @@ class KafkaSampleConsumer(
         )
         temperatureRepository.save(entity)
     }
+
+    @KafkaListener(
+        topics = ["averageTemperatureInC"],
+        containerFactory = "kafkaListenerContainerFactory",
+    )
+    fun consume2(record: ConsumerRecord<String, Temperature>, ack: Acknowledgment) {
+        val averageTemperature = record.value()
+        println("average temperature: ${averageTemperature.temperature}")
+    }
 }

@@ -3,12 +3,16 @@ package kr.co.kafka.streams
 import Temperature
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG
 import io.confluent.kafka.streams.serdes.protobuf.KafkaProtobufSerde
+import java.time.Duration
+import javax.swing.text.html.HTML.Tag.P
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.KStream
+import org.apache.kafka.streams.kstream.TimeWindows
 import org.apache.kafka.streams.kstream.ValueMapper
+import org.apache.kafka.streams.kstream.Window
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.annotation.EnableKafkaStreams
@@ -50,7 +54,7 @@ class KafkaStreamsConfig {
     }
 
     @Bean
-    fun kStream(kStreamBuilder: StreamsBuilder): KStream<String, Temperature> {
+    fun fToCStream(kStreamBuilder: StreamsBuilder): KStream<String, Temperature> {
         val stream = kStreamBuilder.stream<String, Temperature>("temperature")
         stream
             .mapValues<Temperature>(ValueMapper<Temperature, Temperature> { value: Temperature ->
