@@ -1,0 +1,7 @@
+server:
+  port: 49000
+
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: localhost:10001, localhost:10002, localhost:10000

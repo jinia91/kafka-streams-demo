@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+
+message Temperature {
+  // 센서 아이디
+  int32 sensor_id = 1;
+  // 센서 지역
+  string sensor_location = 2;
+  // 센서 화씨 온도
+  double temperature = 3;
+  // 단위
+  string unit = 4;
+}

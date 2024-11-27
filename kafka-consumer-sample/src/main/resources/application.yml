@@ -1,0 +1,22 @@
+server:
+  port: 49003
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6380
+  datasource:
+    url: jdbc:mysql://localhost:3307/kafka?useSSL=false
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+  kafka:
+    producer:
+      bootstrap-servers: localhost:10001, localhost:10002, localhost:10000
+  mvc:
+    async:
+      request-timeout: 60s
