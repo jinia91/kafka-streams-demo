@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
         producer.publish(Temperature.newBuilder()
             .setSensorLocation("Daegu")
 //            .setTemperature(it.toDouble())
-            .setTemperature(kotlin.random.Random.nextDouble(23.0, 30.2))
+            .setTemperature(kotlin.random.Random.nextDouble(23.0, 150.2))
             .setUnit("F")
             .build())
         Thread.sleep(1000)

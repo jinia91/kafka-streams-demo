@@ -10,8 +10,11 @@ import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
+import org.apache.kafka.streams.kstream.Branched
+import org.apache.kafka.streams.kstream.Consumed
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Materialized
+import org.apache.kafka.streams.kstream.Named
 import org.apache.kafka.streams.kstream.Produced
 import org.apache.kafka.streams.kstream.SlidingWindows
 import org.apache.kafka.streams.kstream.TimeWindows
@@ -30,12 +33,6 @@ import org.springframework.kafka.streams.KafkaStreamsInteractiveQueryService
 @Configuration
 @EnableKafkaStreams
 class KafkaStreamsConfig {
-    @Bean
-    fun kafkaStreamsInteractiveQueryService(streamsBuilderFactoryBean: StreamsBuilderFactoryBean): KafkaStreamsInteractiveQueryService {
-        val kafkaStreamsInteractiveQueryService =
-            KafkaStreamsInteractiveQueryService(streamsBuilderFactoryBean)
-        return kafkaStreamsInteractiveQueryService
-    }
 
     @Bean(name = [KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME])
     fun temperatureConfigs(): KafkaStreamsConfiguration {
@@ -55,6 +52,13 @@ class KafkaStreamsConfig {
         serdeConfig[SCHEMA_REGISTRY_URL_CONFIG] = "http://localhost:8081"
         protobufSerde.configure(serdeConfig, false)
         return protobufSerde
+    }
+
+    @Bean
+    fun kafkaStreamsInteractiveQueryService(streamsBuilderFactoryBean: StreamsBuilderFactoryBean): KafkaStreamsInteractiveQueryService {
+        val kafkaStreamsInteractiveQueryService =
+            KafkaStreamsInteractiveQueryService(streamsBuilderFactoryBean)
+        return kafkaStreamsInteractiveQueryService
     }
 
     @Bean
@@ -83,6 +87,29 @@ class KafkaStreamsConfig {
     }
 
     @Bean
+    fun cProcessStream(kStreamBuilder: StreamsBuilder): KStream<String, String> {
+        val originStream = kStreamBuilder.stream<String, Temperature>("temperatureInC")
+
+        val branches = originStream.split(Named.`as`("celsius-branch-"))
+            .branch({ _, value -> value.temperature < 0.0 }, Branched.`as`("negative"))
+            .branch({ _, value -> value.temperature >= 0.0 }, Branched.`as`("positive"))
+            .defaultBranch()
+
+        val negativeStream = branches["celsius-branch-negative"]!!.mapValues {
+            _, value -> "Temperature is below 0C: ${value.temperature}C"
+        }
+
+        val positiveStream = branches["celsius-branch-positive"]!!.mapValues {
+            _, value -> "Temperature is above 0C: ${value.temperature}C"
+        }
+
+        val sink = negativeStream.merge(positiveStream)
+
+        sink.to("temperatureInCProcess", Produced.with(Serdes.String(), Serdes.String()))
+        return sink
+    }
+
+    @Bean
     fun averageInCStream(kStreamBuilder: StreamsBuilder): KStream<String, String> {
         val originStream = kStreamBuilder.stream<String, Temperature>("temperatureInC")
 
@@ -102,7 +129,7 @@ class KafkaStreamsConfig {
                     val newCount = count.toLong() + 1
                     "$newSum,$newCount"
                 },
-                Materialized.`as`<String?, String?, WindowStore<Bytes, ByteArray>?>("state-store")
+                Materialized.`as`<String?, String?, WindowStore<Bytes, ByteArray>?>("state-store2")
                     .withKeySerde(Serdes.String())
                     .withValueSerde(Serdes.String())
 
