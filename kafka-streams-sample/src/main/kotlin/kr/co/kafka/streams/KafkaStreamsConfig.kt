@@ -19,6 +19,7 @@ import org.apache.kafka.streams.kstream.Produced
 import org.apache.kafka.streams.kstream.SlidingWindows
 import org.apache.kafka.streams.kstream.TimeWindows
 import org.apache.kafka.streams.kstream.ValueMapper
+import org.apache.kafka.streams.kstream.Windows
 import org.apache.kafka.streams.state.WindowStore
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -120,7 +121,8 @@ class KafkaStreamsConfig {
                 value.temperature.toString()
             })
             .groupByKey()
-            .windowedBy(SlidingWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(10)))
+//            .windowedBy(Windows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(10)))
+            .windowedBy(TimeWindows.of(Duration.ofSeconds(10)))
             .aggregate(
                 {"0.0,0"},
                 { _: String, value: String, aggregate: String ->

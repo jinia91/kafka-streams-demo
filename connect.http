@@ -22,7 +22,7 @@ Content-Type: application/json
     "database.allowPublicKeyRetrieval": "false",
     "database.server.id": "10000",
     "database.include.list": "kafka",
-    "topic.prefix": "demo2",
+    "topic.prefix": "cdc",
     "schema.history.internal.kafka.bootstrap.servers": "PLAINTEXT://Kafka00Service:9092,PLAINTEXT://Kafka01Service:9092,PLAINTEXT://Kafka02Service:9092",
     "schema.history.internal.kafka.topic": "schema-changes.demo2",
     "key.converter": "org.apache.kafka.connect.storage.StringConverter",
