@@ -1,0 +1,56 @@
+###
+
+#
+GET http://localhost:8083/connectors
+
+###
+
+## binlog -> kafka 소스 커넥터
+POST http://localhost:8083/connectors/
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "mysql-source-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+    "tasks.max": "1",
+    "database.hostname": "mysql-kafka",
+    "database.port": "3306",
+    "database.user": "root",
+    "database.password": "password",
+    "database.allowPublicKeyRetrieval": "false",
+    "database.server.id": "10000",
+    "database.include.list": "kafka",
+    "topic.prefix": "demo2",
+    "schema.history.internal.kafka.bootstrap.servers": "PLAINTEXT://Kafka00Service:9092,PLAINTEXT://Kafka01Service:9092,PLAINTEXT://Kafka02Service:9092",
+    "schema.history.internal.kafka.topic": "schema-changes.demo2",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.protobuf.ProtobufConverter",
+    "value.converter.schema.registry.url": "http://schema-registry:8081",
+    "database.history.kafka.bootstrap.servers": "PLAINTEXT://Kafka00Service:9092,PLAINTEXT://Kafka01Service:9092,PLAINTEXT://Kafka02Service:9092",
+    "database.history.kafka.topic": "schema-changes.demo2"
+
+  }
+}
+
+###
+## kafka -> redis 싱크 커넥터
+POST http://localhost:8083/connectors/
+Accept: application/json
+Content-Type: application/json
+
+{"name": "redis-sink2",
+  "config": {
+    "connector.class":"com.redis.kafka.connect.RedisSinkConnector",
+    "tasks.max":"1",
+    "topics":"demo2.kafka.temperature_entity",
+    "redis.insecure": "true",
+    "redis.command": "HSET",
+    "redis.uri":"redis://redis-kafka:6379",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "io.confluent.connect.protobuf.ProtobufConverter",
+    "value.converter.schema.registry.url": "http://schema-registry:8081"
+  }
+}
+
