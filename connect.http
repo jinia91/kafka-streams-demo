@@ -44,7 +44,7 @@ Content-Type: application/json
   "config": {
     "connector.class":"com.redis.kafka.connect.RedisSinkConnector",
     "tasks.max":"1",
-    "topics":"demo2.kafka.temperature_entity",
+    "topics":"cdc.kafka.temperature_entity",
     "redis.insecure": "true",
     "redis.command": "HSET",
     "redis.uri":"redis://redis-kafka:6379",
