@@ -30,7 +30,6 @@ Content-Type: application/json
     "value.converter.schema.registry.url": "http://schema-registry:8081",
     "database.history.kafka.bootstrap.servers": "PLAINTEXT://Kafka00Service:9092,PLAINTEXT://Kafka01Service:9092,PLAINTEXT://Kafka02Service:9092",
     "database.history.kafka.topic": "schema-changes.demo2"
-
   }
 }
 

@@ -121,8 +121,7 @@ class KafkaStreamsConfig {
                 value.temperature.toString()
             })
             .groupByKey()
-//            .windowedBy(Windows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(10)))
-            .windowedBy(TimeWindows.of(Duration.ofSeconds(10)))
+            .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofSeconds(10)))
             .aggregate(
                 {"0.0,0"},
                 { _: String, value: String, aggregate: String ->
